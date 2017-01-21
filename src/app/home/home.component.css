@@ -1,0 +1,11 @@
+:host .background-grey {
+  background-color: lightgray;
+  height: 180px
+}
+
+:host .middle {
+  top: 43%;
+  position: absolute;
+  text-align: center;
+  left: 33%;
+}
