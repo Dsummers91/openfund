@@ -24,13 +24,11 @@ function sendCoin() {
   var amount = parseInt(document.getElementById("amount").value);
   var receiver = document.getElementById("receiver").value;
 
-  setStatus("Initiating transaction... (please wait)");
-
   meta.sendCoin(receiver, amount, {from: account}).then(function() {
-    setStatus("Transaction complete!");
+    console.log('fdsfs');
     refreshBalance();
   }).catch(function(e) {
-    console.log(e);
+    console.log('e');
     setStatus("Error sending coin; see log.");
   });
 };

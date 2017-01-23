@@ -1,7 +1,14 @@
-<div class="col-xs-3">
-  <br> <br> OPEN FUND
-  <br> <br>
+<!--<div class="col-xs-4">
+  <input type="test" name="contractaddress" [ngModel]="contractAddress">
+  <button type="button" class="button" (click)="setContract(contractAddress)">Set Contract</button>
 </div>
+-->
+
+<project-create [(web3)]="web3" (contractCreated)="getRepo($event)" [(active)]="projectExists" [(openFund)]="openFund" [account]="account"></project-create>
+
+<h1 class="col-xs-12 text-center">
+  {{route.snapshot.url}}
+</h1>
 <section>
   <div class="col-xs-6">
     <dl class="dl-horizontal">
@@ -9,17 +16,21 @@
       <dd>Jan 8, 2017</dd>
     </dl>
   </div>
+  <div class="col-xs-6">
+    <input type="number" [(ngModel)]="etherToSend">
+    <button class="btn btn-primary" (click)="sendTransaction(etherToSend)">Send an Eth</button>
+  </div>
 </section>
 <div class="clearfix"></div>
 <div class="container well">
   <div class="col-xs-4">
-    <span class="text-success">Money Received to Date: $0</span>
+    <span class="text-success">Received to Date: {{moneyReceivedToDate}}</span>
   </div>
   <div class="col-xs-4">
-    <span class="text-danger">Money Withdrawn to Date: $0</span>
+    <span class="text-danger">Withdrawn to Date: {{moneyWithdrawnToDate}}</span>
   </div>
   <div class="col-xs-4">
-    <span class="text-info">Current Balance</span>
+    <span class="text-info">Current Balance:</span> {{currentBalance}}
   </div>
 </div>
 <div class="container">
@@ -28,7 +39,6 @@
       <tr>
         <th>Date</th>
         <th>Amount</th>
-        <th>Transaction</th>
         <th>From</th>
         <th>To</th>
       </tr>
@@ -36,8 +46,7 @@
     <tbody>
       <tr *ngFor="let contribution of contributions">
         <td> {{ contribution.date }} </td>
-        <td> {{ contribution.amount }} </td>
-        <td> {{ contribution.transaction }} </td>
+        <td> {{ contribution.value }} </td>
         <td> {{ contribution.from }} </td>
         <td> {{ contribution.to }} </td>
       </tr>

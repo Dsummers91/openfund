@@ -4,9 +4,9 @@ import { ProjectHomeComponent } from './project-home.component';
 
 const routes: Routes = [
   {
-    path: 'project',
+    path: ':repo',
     component: ProjectHomeComponent
   }
 ]
 
-export const ProjectHomeRouting: ModuleWithProviders = RouterModule.forRoot(routes)
+export const ProjectRouting: ModuleWithProviders = RouterModule.forRoot(routes)
