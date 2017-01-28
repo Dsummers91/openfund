@@ -13,7 +13,7 @@ export class ProjectHomeComponent implements OnInit {
   account: string;
   openFund: any;
   web3: any;
-  contractAddress: string = '0x09a02feb97aa320f7a3e2b317aad9f7e45f981c2'; // enter contract address here;
+  contractAddress: string = '0x1081d84630feb4f89dc33f422c546199ac36fc80'; // enter contract address here;
   currentBalance: number;
   repo: any;
   moneyReceivedToDate: number = 0;
@@ -21,6 +21,8 @@ export class ProjectHomeComponent implements OnInit {
   address: string;
   title: string;
   projectExists: boolean = true;
+  _user: string;
+  _repo: string;
 
   constructor(
     private route: ActivatedRoute
@@ -41,11 +43,13 @@ export class ProjectHomeComponent implements OnInit {
       }
 
       this.accounts = accs;
+      console.log(accs[0]);
       this.account = this.accounts[0];
       this.route.params.subscribe((route) => {
         this.setContract();
-        this.getRepo(route['repo']);
-        console.log(this.route.snapshot.url)
+        this._user = route['user'];
+        this._repo = route['repo'];
+        this.getRepo();
       })
     });
   }
@@ -58,12 +62,12 @@ export class ProjectHomeComponent implements OnInit {
     if(!this.contractAddress) alert('ERROR: Enter OpenFund Address in project-home Component.')
     this.openFund = this.web3.eth.contract(abi).at(this.contractAddress);
     this.address = this.openFund.address;
-    this.title = this.openFund._title();
     window['openFund'] = this.openFund;
   }
 
   getAllTransactions() {
-    var depositEventAll = this.repo['Transaction']({}, { fromBlock: 0, toBlock: 'latest' });
+    window['repo'] = this.repo;
+    var depositEventAll = this.repo['Deposit']({}, { fromBlock: 0, toBlock: 'latest' });
     depositEventAll.get((err, result) => {
       if (err) {
         console.log(err)
@@ -84,47 +88,70 @@ export class ProjectHomeComponent implements OnInit {
         return contribution;
       })
     })
-    this.currentBalance = this.web3.fromWei(this.repo._balance(), 'ether');
+    var withdrawEventAll = this.repo['Withdraw']({}, { fromBlock: 0, toBlock: 'latest' });
+    withdrawEventAll.get((err, result) => {
+      if (err) {
+        console.log(err)
+        return;
+      }
+      console.log(result);
+      this.moneyReceivedToDate = 0;
+      this.moneyWithdrawnToDate = 0;
+      let withdrawals = result.map((contribution) => {
+        if (contribution.args.to === this.repo.address) {
+          this.moneyReceivedToDate += +this.web3.fromWei(contribution.args.value, 'ether')
+        } else {
+          this.moneyWithdrawnToDate += +this.web3.fromWei(contribution.args.value, 'ether')
+        }
+        contribution.value = this.web3.fromWei(contribution.args.value, 'ether');
+        contribution.date = new Date(+contribution.args.date);
+        contribution.from = contribution.args.from;
+        contribution.to = contribution.args.to;
+        return contribution;
+      });
+      this.contributions.push(...withdrawals);
+    })
+
+    this.currentBalance = this.web3.fromWei(this.web3.eth.getBalance(this.repo.address), 'ether');
+    console.log(this.web3.eth.getBalance(this.repo.address));
   }
 
   sendTransaction(ether: number) {
     this.web3.eth.sendTransaction(
       {
-        from: this.account, to: this.repo['address'],
+        from: this.account, to: this.repo.address,
         value: this.web3.toWei(ether, "ether")
       }, (err, res) => {
         if (err) console.error(err);
-        console.log(res);
-        console.log(this.repo._title());
         this.getAllTransactions();
       })
   }
 
-  withdraw() {
-    this.repo.withdraw({ from: this.account, gas: 2000000 }, (err, res) => {
+  withdraw(value) {
+    this.repo.withdraw(value, { from: this.account, gas: 2500000 }, (err, res) => {
       if (err) console.log(err);
       console.log(res);
     })
   }
-  addRepo(repo) {
-    this.openFund.addRepo(repo, { from: this.account, gas: 1000000 }, (err, res) => {
+  addRepo() {
+    this.openFund.addRepo(this._user, this._repo, { from: this.account, gas: 106000000 }, (err, res) => {
       if (err) console.log(err);
       console.log('creating repo');
     })
   }
 
-  getRepo(repo) {
-    console.log(this.route.snapshot.params)
-    this.openFund.getRepo.call(this.route.snapshot.params['repo'], (err, res) => {
+  getRepo() {
+    console.log(this._user, this._repo);
+    this.openFund.getRepo.call(this._user, this._repo, (err, res) => {
       if (err) console.log(err);
       if(res === '0x0000000000000000000000000000000000000000') return this.projectExists = false;
-      console.log('ff');
       this.repo = this.web3.eth.contract(repoAbi).at(res);
       this.getAllTransactions();
     });
   }
 }
 
-const abi = [{ "constant": false, "inputs": [{ "name": "repo", "type": "string" }], "name": "getRepo", "outputs": [{ "name": "", "type": "address" }], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "_owner", "outputs": [{ "name": "", "type": "address" }], "payable": false, "type": "function" }, { "constant": true, "inputs": [], "name": "_title", "outputs": [{ "name": "", "type": "string" }], "payable": false, "type": "function" }, { "constant": false, "inputs": [{ "name": "repo", "type": "string" }], "name": "addRepo", "outputs": [], "payable": false, "type": "function" }, { "inputs": [], "payable": false, "type": "constructor" }]
+const abi = [{"constant":false,"inputs":[{"name":"user","type":"string"},{"name":"repo","type":"string"}],"name":"getRepo","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_owner","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"user","type":"string"},{"name":"repo","type":"string"}],"name":"addRepo","outputs":[],"payable":false,"type":"function"},{"inputs":[],"payable":false,"type":"constructor"}]
 
-const repoAbi = [{"constant":false,"inputs":[{"name":"myid","type":"bytes32"},{"name":"result","type":"string"}],"name":"__callback","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"myid","type":"bytes32"},{"name":"result","type":"string"},{"name":"proof","type":"bytes"}],"name":"__callback","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"withdraw","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_balance","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_repo","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_owner","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_title","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"inputs":[{"name":"repo","type":"string"}],"payable":false,"type":"constructor"},{"payable":true,"type":"fallback"},{"anonymous":false,"inputs":[{"indexed":false,"name":"date","type":"uint256"},{"indexed":false,"name":"value","type":"uint256"},{"indexed":false,"name":"from","type":"address"},{"indexed":false,"name":"to","type":"address"}],"name":"Transaction","type":"event"}]
+
+const repoAbi = [{"constant":true,"inputs":[],"name":"_address","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"myid","type":"bytes32"},{"name":"result","type":"string"}],"name":"__callback","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"value","type":"uint256"}],"name":"withdraw","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_withdrawAmount","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"myid","type":"bytes32"},{"name":"result","type":"string"},{"name":"proof","type":"bytes"}],"name":"__callback","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_balance","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_repo","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_user","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_owner","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_title","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"inputs":[{"name":"user","type":"string"},{"name":"repo","type":"string"}],"payable":false,"type":"constructor"},{"payable":true,"type":"fallback"},{"anonymous":false,"inputs":[{"indexed":false,"name":"date","type":"uint256"},{"indexed":false,"name":"value","type":"uint256"},{"indexed":false,"name":"from","type":"address"},{"indexed":false,"name":"to","type":"address"}],"name":"Deposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"date","type":"uint256"},{"indexed":false,"name":"value","type":"uint256"},{"indexed":false,"name":"from","type":"address"},{"indexed":false,"name":"to","type":"address"}],"name":"Withdraw","type":"event"}]

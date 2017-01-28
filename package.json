@@ -4,7 +4,7 @@
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
-    "start": "ng serve",
+    "start": "concurrently \"ng serve\" \"testrpc --mnemonic 'openfund' --accounts 50\"",
     "lint": "tslint \"src/**/*.ts\"",
     "test": "ng test",
     "pree2e": "webdriver-manager update",
@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "^2.4.1",
     "@angular/router": "3.4.2",
     "bootstrap": "^3.3.7",
+    "concurrently": "^3.1.0",
     "core-js": "^2.4.1",
     "rxjs": "5.0.3",
     "solc": "^0.4.8",

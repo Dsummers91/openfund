@@ -4,7 +4,7 @@ import { ProjectHomeComponent } from './project-home.component';
 
 const routes: Routes = [
   {
-    path: ':repo',
+    path: ':user/:repo',
     component: ProjectHomeComponent
   }
 ]

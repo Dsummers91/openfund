@@ -231,13 +231,13 @@ var SolidityEvent = require("web3/lib/web3/event.js");
 
   Contract.new = function() {
     if (this.currentProvider == null) {
-      throw new Error("OrganizationContract error: Please call setProvider() first before calling new().");
+      throw new Error("strings error: Please call setProvider() first before calling new().");
     }
 
     var args = Array.prototype.slice.call(arguments);
 
     if (!this.unlinked_binary) {
-      throw new Error("OrganizationContract error: contract binary not set. Can't deploy new instance.");
+      throw new Error("strings error: contract binary not set. Can't deploy new instance.");
     }
 
     var regex = /__[^_]+_+/g;
@@ -256,7 +256,7 @@ var SolidityEvent = require("web3/lib/web3/event.js");
         return name != arr[index + 1];
       }).join(", ");
 
-      throw new Error("OrganizationContract contains unresolved libraries. You must deploy and link the following libraries before you can deploy a new version of OrganizationContract: " + unlinked_libraries);
+      throw new Error("strings contains unresolved libraries. You must deploy and link the following libraries before you can deploy a new version of strings: " + unlinked_libraries);
     }
 
     var self = this;
@@ -297,7 +297,7 @@ var SolidityEvent = require("web3/lib/web3/event.js");
 
   Contract.at = function(address) {
     if (address == null || typeof address != "string" || address.length != 42) {
-      throw new Error("Invalid address passed to OrganizationContract.at(): " + address);
+      throw new Error("Invalid address passed to strings.at(): " + address);
     }
 
     var contract_class = this.web3.eth.contract(this.abi);
@@ -308,7 +308,7 @@ var SolidityEvent = require("web3/lib/web3/event.js");
 
   Contract.deployed = function() {
     if (!this.address) {
-      throw new Error("Cannot find deployed address: OrganizationContract not deployed or address not set.");
+      throw new Error("Cannot find deployed address: strings not deployed or address not set.");
     }
 
     return this.at(this.address);
@@ -348,29 +348,10 @@ var SolidityEvent = require("web3/lib/web3/event.js");
 
   Contract.all_networks = {
   "default": {
-    "abi": [
-      {
-        "constant": true,
-        "inputs": [],
-        "name": "owner",
-        "outputs": [
-          {
-            "name": "",
-            "type": "address"
-          }
-        ],
-        "payable": false,
-        "type": "function"
-      },
-      {
-        "inputs": [],
-        "payable": false,
-        "type": "constructor"
-      }
-    ],
-    "unlinked_binary": "0x6060604052346000575b60008054600160a060020a03191632600160a060020a03161790555b5b609d806100346000396000f300606060405263ffffffff60e060020a6000350416638da5cb5b81146022575b6000565b34600057602c6055565b6040805173ffffffffffffffffffffffffffffffffffffffff9092168252519081900360200190f35b60005473ffffffffffffffffffffffffffffffffffffffff16815600a165627a7a72305820af0b2048a86ae1834a1f4355b9999c6ee923e13503fce3dc0218f8f2a25db0040029",
+    "abi": [],
+    "unlinked_binary": "0x6060604052346000575b60358060166000396000f30060606040525b60005600a165627a7a72305820cec7312df7eed547b14318b8a7a1ccdff0ef236e7948a964d1f9cfd6efacd0ed0029",
     "events": {},
-    "updated_at": 1485618082928,
+    "updated_at": 1485618082936,
     "links": {}
   }
 };
@@ -456,7 +437,7 @@ var SolidityEvent = require("web3/lib/web3/event.js");
     Contract.links[name] = address;
   };
 
-  Contract.contract_name   = Contract.prototype.contract_name   = "OrganizationContract";
+  Contract.contract_name   = Contract.prototype.contract_name   = "strings";
   Contract.generated_with  = Contract.prototype.generated_with  = "3.2.0";
 
   // Allow people to opt-in to breaking changes now.
@@ -496,6 +477,6 @@ var SolidityEvent = require("web3/lib/web3/event.js");
   } else {
     // There will only be one version of this contract in the browser,
     // and we can use that.
-    window.OrganizationContract = Contract;
+    window.strings = Contract;
   }
 })();
