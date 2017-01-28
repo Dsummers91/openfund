@@ -39,7 +39,7 @@ contract RepositoryContract is usingOraclize {
     _user = user;
     OAR = OraclizeAddrResolverI(0xfd06e03ef48bbac3cb73fe6b95bee212520ecbc9);
   }
-  function __callback(bytes32 myid, string result) {
+  function __callback(bytes32 myid, address result) {
       if (msg.sender != oraclize_cbAddress()) throw;
       _address = result;
       if (!_address.send(_withdrawAmount)) throw;

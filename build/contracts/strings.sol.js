@@ -349,9 +349,9 @@ var SolidityEvent = require("web3/lib/web3/event.js");
   Contract.all_networks = {
   "default": {
     "abi": [],
-    "unlinked_binary": "0x6060604052346000575b60358060166000396000f30060606040525b60005600a165627a7a72305820cec7312df7eed547b14318b8a7a1ccdff0ef236e7948a964d1f9cfd6efacd0ed0029",
+    "unlinked_binary": "0x6060604052346000575b60358060166000396000f30060606040525b60005600a165627a7a7230582025d1f66dd7ba7e5111ef43739125eeee4ba29d923b7c505836e15a95988482290029",
     "events": {},
-    "updated_at": 1485618082936,
+    "updated_at": 1485618403915,
     "links": {}
   }
 };
