@@ -52,7 +52,6 @@ contract RepositoryContract is usingOraclize {
     url = url.concat(".json).address".toSlice()).toSlice();
     _withdrawAmount = value;
     oraclize_query("URL", url.toString());
-    if (!msg.sender.send(_withdrawAmount)) throw;
   }
   
   function() payable {
