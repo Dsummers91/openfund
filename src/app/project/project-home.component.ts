@@ -13,11 +13,11 @@ export class ProjectHomeComponent implements OnInit {
   account: string;
   openFund: any;
   web3: any;
-  contractAddress: string = '0x1081d84630feb4f89dc33f422c546199ac36fc80'; // enter contract address here;
-  currentBalance: number;
+  contractAddress: string = '0x77886d65e49e453fcdc1545b0697f53770a2121f';
   repo: any;
   moneyReceivedToDate: number = 0;
   moneyWithdrawnToDate: number = 0;
+  currentBalance: number = 0;
   address: string;
   title: string;
   projectExists: boolean = true;
@@ -43,7 +43,6 @@ export class ProjectHomeComponent implements OnInit {
       }
 
       this.accounts = accs;
-      console.log(accs[0]);
       this.account = this.accounts[0];
       this.route.params.subscribe((route) => {
         this.setContract();
@@ -67,7 +66,7 @@ export class ProjectHomeComponent implements OnInit {
 
   getAllTransactions() {
     window['repo'] = this.repo;
-    var depositEventAll = this.repo['Deposit']({}, { fromBlock: 0, toBlock: 'latest' });
+    var depositEventAll = this.repo['Transaction']({}, { fromBlock: 0, toBlock: 'latest' });
     depositEventAll.get((err, result) => {
       if (err) {
         console.log(err)
@@ -82,40 +81,24 @@ export class ProjectHomeComponent implements OnInit {
           this.moneyWithdrawnToDate += +this.web3.fromWei(contribution.args.value, 'ether')
         }
         contribution.value = this.web3.fromWei(contribution.args.value, 'ether');
-        contribution.date = new Date(+contribution.args.date);
-        contribution.from = contribution.args.from;
-        contribution.to = contribution.args.to;
+        contribution.date = new Date(1000*contribution.args.date);
+        contribution.from = this.showAddress(contribution.args.from);
+        contribution.to = this.showAddress(contribution.args.to);
         return contribution;
       })
     })
-    var withdrawEventAll = this.repo['Withdraw']({}, { fromBlock: 0, toBlock: 'latest' });
-    withdrawEventAll.get((err, result) => {
-      if (err) {
-        console.log(err)
-        return;
-      }
-      console.log(result);
-      this.moneyReceivedToDate = 0;
-      this.moneyWithdrawnToDate = 0;
-      let withdrawals = result.map((contribution) => {
-        if (contribution.args.to === this.repo.address) {
-          this.moneyReceivedToDate += +this.web3.fromWei(contribution.args.value, 'ether')
-        } else {
-          this.moneyWithdrawnToDate += +this.web3.fromWei(contribution.args.value, 'ether')
-        }
-        contribution.value = this.web3.fromWei(contribution.args.value, 'ether');
-        contribution.date = new Date(+contribution.args.date);
-        contribution.from = contribution.args.from;
-        contribution.to = contribution.args.to;
-        return contribution;
-      });
-      this.contributions.push(...withdrawals);
-    })
-
     this.currentBalance = this.web3.fromWei(this.web3.eth.getBalance(this.repo.address), 'ether');
     console.log(this.web3.eth.getBalance(this.repo.address));
   }
 
+  showAddress(address: string) :string {
+    console.log(address === this.repo.address);
+
+    if(address === this.repo.address) {
+      return this.repo._repo();
+    }
+    return address;
+  }
   sendTransaction(ether: number) {
     this.web3.eth.sendTransaction(
       {
@@ -128,13 +111,15 @@ export class ProjectHomeComponent implements OnInit {
   }
 
   withdraw(value) {
-    this.repo.withdraw(value, { from: this.account, gas: 2500000 }, (err, res) => {
+    value = this.web3.toWei(value, "ether");
+    console.log(value);
+    this.repo.withdraw(value, { from: this.account, gas: 3500000 }, (err, res) => {
       if (err) console.log(err);
       console.log(res);
     })
   }
   addRepo() {
-    this.openFund.addRepo(this._user, this._repo, { from: this.account, gas: 106000000 }, (err, res) => {
+    this.openFund.addRepo(this._user, this._repo, { from: this.account, gas: 225000000 }, (err, res) => {
       if (err) console.log(err);
       console.log('creating repo');
     })
@@ -154,4 +139,4 @@ export class ProjectHomeComponent implements OnInit {
 const abi = [{"constant":false,"inputs":[{"name":"user","type":"string"},{"name":"repo","type":"string"}],"name":"getRepo","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_owner","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"user","type":"string"},{"name":"repo","type":"string"}],"name":"addRepo","outputs":[],"payable":false,"type":"function"},{"inputs":[],"payable":false,"type":"constructor"}]
 
 
-const repoAbi = [{"constant":true,"inputs":[],"name":"_address","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"myid","type":"bytes32"},{"name":"result","type":"string"}],"name":"__callback","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"value","type":"uint256"}],"name":"withdraw","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_withdrawAmount","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"myid","type":"bytes32"},{"name":"result","type":"string"},{"name":"proof","type":"bytes"}],"name":"__callback","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_balance","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_repo","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_user","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_owner","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_title","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"inputs":[{"name":"user","type":"string"},{"name":"repo","type":"string"}],"payable":false,"type":"constructor"},{"payable":true,"type":"fallback"},{"anonymous":false,"inputs":[{"indexed":false,"name":"date","type":"uint256"},{"indexed":false,"name":"value","type":"uint256"},{"indexed":false,"name":"from","type":"address"},{"indexed":false,"name":"to","type":"address"}],"name":"Deposit","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"date","type":"uint256"},{"indexed":false,"name":"value","type":"uint256"},{"indexed":false,"name":"from","type":"address"},{"indexed":false,"name":"to","type":"address"}],"name":"Withdraw","type":"event"}]
+const repoAbi = [{"constant":true,"inputs":[],"name":"_address","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"myid","type":"bytes32"},{"name":"result","type":"string"}],"name":"__callback","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"value","type":"uint256"}],"name":"withdraw","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_withdrawAmount","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"myid","type":"bytes32"},{"name":"result","type":"string"},{"name":"proof","type":"bytes"}],"name":"__callback","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_balance","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_repo","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_user","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_owner","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"_title","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"updateAddress","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"executeWithdrawal","outputs":[],"payable":false,"type":"function"},{"inputs":[{"name":"user","type":"string"},{"name":"repo","type":"string"}],"payable":false,"type":"constructor"},{"payable":true,"type":"fallback"},{"anonymous":false,"inputs":[{"indexed":false,"name":"date","type":"uint256"},{"indexed":false,"name":"value","type":"uint256"},{"indexed":false,"name":"from","type":"address"},{"indexed":false,"name":"to","type":"address"}],"name":"Transaction","type":"event"}]

@@ -457,6 +457,32 @@ var SolidityEvent = require("web3/lib/web3/event.js");
             "type": "string"
           },
           {
+            "name": "_argN",
+            "type": "bytes"
+          }
+        ],
+        "name": "queryN",
+        "outputs": [
+          {
+            "name": "_id",
+            "type": "bytes32"
+          }
+        ],
+        "payable": true,
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [
+          {
+            "name": "_timestamp",
+            "type": "uint256"
+          },
+          {
+            "name": "_datasource",
+            "type": "string"
+          },
+          {
             "name": "_arg1",
             "type": "string"
           },
@@ -552,6 +578,36 @@ var SolidityEvent = require("web3/lib/web3/event.js");
         "constant": false,
         "inputs": [
           {
+            "name": "_timestamp",
+            "type": "uint256"
+          },
+          {
+            "name": "_datasource",
+            "type": "string"
+          },
+          {
+            "name": "_argN",
+            "type": "bytes"
+          },
+          {
+            "name": "_gaslimit",
+            "type": "uint256"
+          }
+        ],
+        "name": "queryN_withGasLimit",
+        "outputs": [
+          {
+            "name": "_id",
+            "type": "bytes32"
+          }
+        ],
+        "payable": true,
+        "type": "function"
+      },
+      {
+        "constant": false,
+        "inputs": [
+          {
             "name": "_gasPrice",
             "type": "uint256"
           }
@@ -576,7 +632,7 @@ var SolidityEvent = require("web3/lib/web3/event.js");
       }
     ],
     "events": {},
-    "updated_at": 1485618403906,
+    "updated_at": 1489031192803,
     "links": {}
   }
 };

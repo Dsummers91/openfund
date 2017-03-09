@@ -26,7 +26,7 @@ export class ProjectCreateComponent implements OnInit {
   addRepo() {
     let user = this.route.snapshot.url[0].path;
     let repo = this.route.snapshot.url[1].path;
-    this.openFund.addRepo(user, repo, { from: this.account, gas: 1000000 }, (err, res) => {
+    this.openFund.addRepo(user, repo, { from: this.account, gas: 1200000 }, (err, res) => {
       console.log(this.web3.eth.getTransactionReceipt(res));
       if (err) console.log(err);
       this.state = 1;
