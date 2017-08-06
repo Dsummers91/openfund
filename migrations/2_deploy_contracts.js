@@ -1,6 +1,5 @@
+var OpenFundFactory = artifacts.require("OpenFundFactory.sol");
+
 module.exports = function(deployer) {
-  deployer.deploy(ConvertLib);
-  deployer.autolink();
-  deployer.deploy(MetaCoin);
-  deployer.deploy(OpenFund);
+  deployer.deploy(OpenFundFactory);
 };
