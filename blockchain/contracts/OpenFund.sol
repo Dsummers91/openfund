@@ -16,14 +16,16 @@ contract OpenFund is usingOraclize {
   event Transaction(uint date, uint value, address from, address to);
 
   function OpenFund(bytes32 _user, string _repo) {
+    OAR = OraclizeAddrResolverI(0x6f485C8BF6fc43eA212E93BBF8ce046C7f1cb475);
     owner = tx.origin;
     repo = _repo;
     user = _user;
   }
-  function callback(bytes32 myid, string result) {
-      if (msg.sender != oraclize_cbAddress()) throw;
-      addr = parseAddr(result);
-      if (!addr.send(withdrawAmount)) throw;
+    
+  function __callback(bytes32 myid, string result) {
+    if (msg.sender != oraclize_cbAddress()) throw;
+    addr = parseAddr(result);
+    require(addr.transfer(withdrawAmount));
   }
 
   function executeWithdrawal() {
@@ -32,6 +34,7 @@ contract OpenFund is usingOraclize {
   function updateAddress() {
     
   }
+
   function withdraw(uint value) {
    strings.slice memory url = "json(https://raw.githubusercontent.com/Dsummers91/openfund/master/".toSlice();
     url = url.concat(string(repo).toSlice()).toSlice();

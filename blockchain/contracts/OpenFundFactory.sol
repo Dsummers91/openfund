@@ -5,6 +5,7 @@ import './OpenFund.sol';
 
 contract OpenFundFactory is usingOraclize {
   using strings for *;
+  int huh = 24;
 
   address public _owner;
   mapping (bytes32 => mapping(string => address)) _repositories;
@@ -17,7 +18,7 @@ contract OpenFundFactory is usingOraclize {
     _repositories[user][repo] = openfund;
   }
 
-  function getRepo(bytes32 user, string repo) returns (address) {
+  function getRepo(bytes32 user, string repo) constant returns (address) {
     return _repositories[user][repo];
   }
 }
